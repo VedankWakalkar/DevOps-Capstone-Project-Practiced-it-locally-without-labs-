@@ -1,26 +1,26 @@
-name: CI Build  # Name of the workflow
+name: CI Build
 
-on:  # Trigger conditions
+on:
   push:
-    branches: [ main ]  # Run workflow on pushes to main
+    branches: [ main ]
   pull_request:
-    branches: [ main ]  # Run workflow on PRs to main
+    branches: [ main ]
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Use the latest Ubuntu environment
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code  # Checkout repository code
-        uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v3  # Updated to v3
 
-      - name: Set up Node.js  # Set up Node.js
-        uses: actions/setup-node@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v3  # Updated to v3
         with:
-          node-version: '14'
+          node-version: '20'  # Updated to node 20
 
-      - name: Install dependencies  # Install project dependencies
+      - name: Install dependencies
         run: npm install
 
-      - name: Run tests  # Execute tests
+      - name: Run tests
         run: npm test
