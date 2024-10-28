@@ -1,13 +1,15 @@
-name: CI Build
+name: CI Workflow
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,19 +19,18 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: '3.9'  # Use Python 3.9 for compatibility
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Linter
-        run: make lint
+      - name: Lint with flake8
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
 
-      - name: Run Tests
-        run: make tests
-
-      - name: Build Docker Image
-        run: make build
-
+      - name: Run unit tests with nose
+        run: |
+          nosetests -v --with-spec --spec-color --with-coverage --cover-package=service  # Replace 'service' if different
