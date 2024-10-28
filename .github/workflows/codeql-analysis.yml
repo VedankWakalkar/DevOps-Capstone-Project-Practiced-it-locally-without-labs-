@@ -10,7 +10,7 @@ jobs:
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
-    steps:
+    steps:S
       - name: Checkout code
         uses: actions/checkout@v3
 
