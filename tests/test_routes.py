@@ -12,6 +12,9 @@ from tests.factories import AccountFactory
 from service.common import status  # HTTP Status Codes
 from service.models import db, Account, init_db
 from service.routes import app
+from service import talisman ,CORS
+
+HTTPS_ENVIRON = {"wsgi.url_scheme": "https"}
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
@@ -29,6 +32,7 @@ class TestAccountService(TestCase):
     @classmethod
     def setUpClass(cls):
         """Run once before all tests"""
+        talisman.force_https = False
         app.config["TESTING"] = True
         app.config["DEBUG"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
@@ -48,6 +52,7 @@ class TestAccountService(TestCase):
 
     def tearDown(self):
         """Runs once after each test case"""
+        db.session.rollback()
         db.session.remove()
 
     ######################################################################
@@ -124,3 +129,50 @@ class TestAccountService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     # ADD YOUR TEST CASES HERE ...
+    def test_list_accounts(self):
+        response = self.client.get("/accounts")
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.json, list)
+
+    def test_read_account(self):
+        """It should Read an Account by ID"""
+        account = self._create_accounts(1)[0]
+        response = self.client.get(f"{BASE_URL}/{account.id}")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("id", response.json)
+
+        # Test for a non-existent account ID
+        response = self.client.get(f"{BASE_URL}/9999")  # Assuming ID 9999 does not exist
+        self.assertEqual(response.status_code, 404)
+
+    def test_update_account(self):
+        """It should Update an existing Account"""
+        account = self._create_accounts(1)[0]  # Create an account to update
+        update_data = {
+            "name": "New Name",
+            "email": account.email,
+            "address": account.address,
+            "phone_number": account.phone_number,
+            "date_joined": str(account.date_joined)
+        }
+        response = self.client.put(f"{BASE_URL}/{account.id}", json=update_data)
+        print(response.status_code, response.json)  # Debugging line
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json["name"], "New Name")
+
+    def test_delete_account(self):
+        """It should Delete an Account by ID"""
+        account = self._create_accounts(1)[0]
+        response = self.client.delete(f"{BASE_URL}/{account.id}")
+        self.assertEqual(response.status_code, 204)
+
+        # Test for a non-existent account ID
+        response = self.client.delete(f"{BASE_URL}/9999")  # Assuming ID 9999 does not exist
+        self.assertEqual(response.status_code, 204)
+
+    def test_cors_headers(self):
+        """It should have CORS headers on the root URL"""
+        response = self.client.get("/", environ_overrides=HTTPS_ENVIRON)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("Access-Control-Allow-Origin", response.headers)
+        self.assertEqual(response.headers["Access-Control-Allow-Origin"], "*")
