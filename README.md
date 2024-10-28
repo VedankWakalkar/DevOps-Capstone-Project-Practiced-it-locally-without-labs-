@@ -1,5 +1,5 @@
 # DevOps Capstone Template
-[![CI Workflow](https://github.com/VedankWakalkar/DevOps-Capstone-Project/actions/workflows/ci-build.yaml/badge.svg)](https://github.com/VedankWakalkar/DevOps-Capstone-Project/actions/workflows/ci-build.yaml)
+[![CI Workflow](https://github.com/VedankWakalkar/DevOps-Capstone-Project-Practiced-it-locally-without-labs-/actions/workflows/ci-build.yaml/badge.svg)](https://github.com/VedankWakalkar/DevOps-Capstone-Project-Practiced-it-locally-without-labs-/actions/workflows/ci-build.yaml)
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python 3.9](https://img.shields.io/badge/Python-3.9-green.svg)](https://shields.io/)
